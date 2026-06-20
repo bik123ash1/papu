@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy Birthday Papu 🎂</title>
+<style>
+/* ============================================
+   ROOT VARIABLES & RESET
+============================================ */
+:root {
+  --navy:    #0a0e2a;
+  --deep:    #060818;
+  --gold:    #f5c842;
+  --gold2:   #e8a820;
+  --rose:    #ff6b9d;
+  --white:   #ffffff;
+  --glass:   rgba(255,255,255,0.07);
+  --glassborder: rgba(255,255,255,0.15);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;overflow-x:hidden}
+body{
+  background:var(--deep);
+  color:var(--white);
+  font-family:'Georgia',serif;
+  overflow-x:hidden;
+  -webkit-tap-highlight-color:transparent;
+}
+
+/* ============================================
+   INTRO SCREEN
+============================================ */
+#intro{
+  position:fixed;inset:0;
+  background:radial-gradient(ellipse at 50% 60%, #0d1440 0%, #060818 70%);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  z-index:1000;
+  transition:opacity .8s ease, transform .8s ease;
+  text-align:center;padding:2rem;
+}
+#intro.hide{opacity:0;transform:scale(1.05);pointer-events:none}
+
+/* Star canvas behind intro */
+#starCanvas{position:fixed;inset:0;z-index:0;pointer-events:none}
+
+.intro-content{position:relative;z-index:2}
+.intro-emoji{font-size:clamp(3rem,10vw,5rem);animation:floatBob 3s ease-in-out infinite}
+.intro-title{
+  font-size:clamp(1.5rem,6vw,3.2rem);
+  font-weight:700;
+  background:linear-gradient(135deg,var(--gold),#fff 50%,var(--rose));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  line-height:1.3;margin:1rem 0 2rem;
+  animation:glowPulse 3s ease-in-out infinite;
+}
+.tap-btn{
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  color:#0a0e2a;
+  border:none;border-radius:50px;
+  padding:1rem 2.5rem;
+  font-size:1.2rem;font-weight:700;
+  cursor:pointer;
+  box-shadow:0 0 30px rgba(245,200,66,0.5);
+  transition:transform .2s,box-shadow .2s;
+  animation:heartbeat 1.8s ease-in-out infinite;
+}
+.tap-btn:active{transform:scale(.95)}
+
+/* ============================================
+   MAIN SITE (hidden until intro dismissed)
+============================================ */
+#mainSite{opacity:0;transition:opacity 1s ease}
+#mainSite.show{opacity:1}
+
+/* ============================================
+   FLOATING HEARTS LAYER
+============================================ */
+#heartsLayer{
+  position:fixed;inset:0;pointer-events:none;z-index:5;overflow:hidden;
+}
+.fheart{
+  position:absolute;bottom:-60px;
+  font-size:1.4rem;
+  animation:floatHeart linear infinite;
+  opacity:0;
+}
+
+/* ============================================
+   SECTION BASE
+============================================ */
+section{
+  min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:4rem 1.5rem;position:relative;overflow:hidden;
+}
+
+/* ============================================
+   HERO SECTION
+============================================ */
+#hero{
+  background:radial-gradient(ellipse at 30% 50%,#0d1b60 0%,var(--deep) 60%);
+}
+.hero-card{
+  background:var(--glass);
+  border:1px solid var(--glassborder);
+  border-radius:24px;
+  padding:2.5rem 2rem;
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  box-shadow:0 8px 60px rgba(245,200,66,0.12),0 2px 20px rgba(0,0,0,0.5);
+  text-align:center;max-width:600px;width:100%;
+  animation:fadeInUp 1.2s ease forwards;
+}
+.hero-label{
+  font-size:.85rem;letter-spacing:.3em;text-transform:uppercase;
+  color:var(--gold);opacity:.8;margin-bottom:1rem;
+}
+.hero-title{
+  font-size:clamp(2.2rem,9vw,4.5rem);
+  font-weight:700;line-height:1.1;
+  background:linear-gradient(135deg,var(--gold) 0%,#fff 50%,var(--rose) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  animation:glowPulse 3s ease-in-out infinite;
+  margin-bottom:.5rem;
+}
+.hero-date{
+  font-size:clamp(1.1rem,4vw,1.6rem);
+  color:rgba(255,255,255,.7);
+  letter-spacing:.15em;margin-top:.8rem;
+}
+.hero-hearts{margin-top:1.5rem;font-size:1.6rem;letter-spacing:.3rem;
+  animation:heartbeat 1.5s ease-in-out infinite}
+
+/* ============================================
+   TYPEWRITER SECTION
+============================================ */
+#message{
+  background:linear-gradient(180deg,var(--deep) 0%,#0a0e2a 100%);
+}
+.msg-card{
+  background:var(--glass);
+  border:1px solid var(--glassborder);
+  border-radius:24px;
+  padding:2.5rem 2rem;
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  max-width:640px;width:100%;
+  box-shadow:0 0 60px rgba(245,200,66,0.08);
+}
+.msg-card h2{
+  font-size:1.1rem;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:1.5rem;text-align:center;
+}
+#typewriterText{
+  font-size:clamp(1rem,3.5vw,1.15rem);
+  line-height:1.9;color:rgba(255,255,255,.88);
+  white-space:pre-wrap;
+  min-height:18em;
+}
+.cursor{display:inline-block;width:2px;height:1.1em;
+  background:var(--gold);margin-left:2px;
+  animation:blink .7s step-end infinite;vertical-align:text-bottom}
+
+/* ============================================
+   GALLERY SECTION
+============================================ */
+#gallery{
+  background:radial-gradient(ellipse at 70% 50%,#0d1b60 0%,var(--deep) 60%);
+}
+.gallery-title{
+  font-size:clamp(1.5rem,5vw,2.5rem);
+  background:linear-gradient(135deg,var(--gold),var(--rose));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  text-align:center;margin-bottom:2.5rem;font-weight:700;
+}
+.gallery-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+  gap:1.5rem;width:100%;max-width:900px;
+}
+.photo-card{
+  background:var(--glass);
+  border:1px solid var(--glassborder);
+  border-radius:20px;overflow:hidden;
+  backdrop-filter:blur(12px);
+  box-shadow:0 8px 40px rgba(0,0,0,.4);
+  transform:perspective(800px) rotateX(0) rotateY(0);
+  transition:transform .15s ease,box-shadow .3s ease;
+  cursor:pointer;
+}
+.photo-card:hover{box-shadow:0 16px 60px rgba(245,200,66,0.2)}
+.photo-card img{
+  width:100%;height:220px;object-fit:cover;display:block;
+  transition:transform .4s ease;
+}
+.photo-card:hover img{transform:scale(1.04)}
+.photo-caption{
+  padding:.9rem 1rem;text-align:center;
+  font-size:.85rem;color:rgba(255,255,255,.7);letter-spacing:.05em;
+}
+
+/* ============================================
+   SCRATCH CARD SECTION
+============================================ */
+#scratch{
+  background:linear-gradient(180deg,#0a0e2a 0%,#060818 100%);
+}
+.scratch-wrapper{text-align:center;max-width:420px;width:100%}
+.scratch-title{
+  font-size:clamp(1.4rem,5vw,2rem);
+  background:linear-gradient(135deg,var(--gold),var(--rose));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  margin-bottom:.5rem;font-weight:700;
+}
+.scratch-sub{color:rgba(255,255,255,.5);font-size:.9rem;margin-bottom:1.5rem}
+.scratch-container{
+  position:relative;width:100%;max-width:360px;
+  border-radius:18px;overflow:hidden;
+  margin:0 auto;
+  box-shadow:0 0 40px rgba(245,200,66,0.18);
+}
+#scratchReveal{
+  width:100%;padding:3rem 1.5rem;
+  background:linear-gradient(135deg,#1a1040,#2a0a40);
+  display:flex;align-items:center;justify-content:center;
+  min-height:160px;
+}
+#revealMsg{
+  font-size:clamp(1rem,4vw,1.25rem);
+  text-align:center;color:var(--white);
+  font-weight:700;line-height:1.5;
+}
+#scratchCanvas{
+  position:absolute;inset:0;
+  border-radius:18px;
+  cursor:crosshair;touch-action:none;
+}
+.scratch-hint{margin-top:1rem;color:rgba(255,255,255,.35);font-size:.8rem}
+
+/* ============================================
+   FIREWORKS SECTION
+============================================ */
+#fireworks{
+  background:var(--deep);position:relative;overflow:hidden;
+}
+#fireworksCanvas{
+  position:absolute;inset:0;width:100%;height:100%;
+}
+.finale-text{
+  position:relative;z-index:2;text-align:center;
+  pointer-events:none;padding:2rem 1.5rem;
+}
+.finale-big{
+  font-size:clamp(2rem,8vw,4.5rem);
+  font-weight:700;
+  background:linear-gradient(135deg,var(--gold) 0%,var(--rose) 60%,var(--gold) 100%);
+  background-size:200% auto;
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  animation:shimmer 3s linear infinite, glowPulse 2s ease-in-out infinite;
+  line-height:1.2;margin-bottom:1rem;
+}
+.finale-date{
+  font-size:clamp(1.1rem,4vw,1.8rem);
+  color:rgba(255,255,255,.85);letter-spacing:.15em;margin-bottom:.8rem;
+}
+.finale-love{
+  font-size:clamp(1.3rem,5vw,2.2rem);
+  color:var(--rose);margin-bottom:1rem;
+  animation:heartbeat 1.5s ease-in-out infinite;
+}
+.finale-from{
+  font-size:clamp(.9rem,3vw,1.2rem);
+  color:rgba(255,255,255,.6);letter-spacing:.1em;
+}
+
+/* ============================================
+   SCROLL ANIMATIONS
+============================================ */
+.reveal{opacity:0;transform:translateY(40px);transition:opacity .8s ease,transform .8s ease}
+.reveal.zoom{transform:scale(.85);transition:opacity .7s ease,transform .7s ease}
+.reveal.slideLeft{transform:translateX(-50px);transition:opacity .7s ease,transform .7s ease}
+.reveal.slideRight{transform:translateX(50px);transition:opacity .7s ease,transform .7s ease}
+.reveal.visible{opacity:1;transform:none}
+
+/* ============================================
+   KEYFRAME ANIMATIONS
+============================================ */
+@keyframes floatBob{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-14px)}
+}
+@keyframes glowPulse{
+  0%,100%{filter:drop-shadow(0 0 8px rgba(245,200,66,.4))}
+  50%{filter:drop-shadow(0 0 22px rgba(245,200,66,.8))}
+}
+@keyframes heartbeat{
+  0%,100%{transform:scale(1)}
+  14%{transform:scale(1.1)}
+  28%{transform:scale(1)}
+  42%{transform:scale(1.06)}
+  70%{transform:scale(1)}
+}
+@keyframes fadeInUp{
+  from{opacity:0;transform:translateY(40px)}
+  to{opacity:1;transform:translateY(0)}
+}
+@keyframes floatHeart{
+  0%{transform:translateY(0) translateX(0) scale(1);opacity:.9}
+  50%{opacity:.6}
+  100%{transform:translateY(-110vh) translateX(var(--drift)) scale(.4);opacity:0}
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+@keyframes shimmer{
+  0%{background-position:0%}
+  100%{background-position:200%}
+}
+@keyframes twinkle{
+  0%,100%{opacity:.3;transform:scale(.7)}
+  50%{opacity:1;transform:scale(1)}
+}
+
+/* ============================================
+   UTILITY
+============================================ */
+.gold-dot{color:var(--gold)}
+.section-divider{
+  width:60px;height:3px;
+  background:linear-gradient(90deg,var(--gold),var(--rose));
+  border-radius:3px;margin:1rem auto 2rem;
+}
+
+/* ============================================
+   RESPONSIVE TWEAKS
+============================================ */
+@media(max-width:480px){
+  .gallery-grid{grid-template-columns:1fr}
+  section{padding:3rem 1rem}
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================
+     BACKGROUND MUSIC
+============================================ -->
+<audio id="bgMusic" loop>
+  <source src="birthday-song.mp3" type="audio/mpeg">
+</audio>
+
+<!-- ============================================
+     STAR CANVAS (persists across whole page)
+============================================ -->
+<canvas id="starCanvas"></canvas>
+
+<!-- ============================================
+     FLOATING HEARTS LAYER
+============================================ -->
+<div id="heartsLayer"></div>
+
+<!-- ============================================
+     INTRO SCREEN
+============================================ -->
+<div id="intro">
+  <div class="intro-content">
+    <div class="intro-emoji">🎂</div>
+    <h1 class="intro-title">A Special Birthday<br>Surprise For Papu 🎂</h1>
+    <button class="tap-btn" id="tapBtn">Tap To Begin ❤️</button>
+  </div>
+</div>
+
+<!-- ============================================
+     MAIN SITE
+============================================ -->
+<main id="mainSite">
+
+  <!-- HERO SECTION -->
+  <section id="hero">
+    <div class="hero-card reveal zoom">
+      <p class="hero-label">✨ Today is the day ✨</p>
+      <h1 class="hero-title">Happy Birthday<br>Papu 🎂</h1>
+      <div class="section-divider"></div>
+      <p class="hero-date">📅 20 June</p>
+      <p class="hero-hearts">❤️ 🎉 ✨ 🎈 ❤️</p>
+    </div>
+  </section>
+
+  <!-- TYPEWRITER MESSAGE SECTION -->
+  <section id="message">
+    <div class="msg-card reveal">
+      <h2>💌 A Message For You</h2>
+      <div id="typewriterText"><span class="cursor"></span></div>
+    </div>
+  </section>
+
+  <!-- PHOTO GALLERY SECTION -->
+  <section id="gallery">
+    <h2 class="gallery-title reveal">📸 Precious Memories</h2>
+    <div class="section-divider reveal"></div>
+    <div class="gallery-grid">
+      <div class="photo-card reveal slideLeft" data-tilt>
+        <img src="photo1.jpg" alt="Papu photo 1" loading="lazy" onerror="this.style.background='linear-gradient(135deg,#1a1040,#2a0a40)';this.style.height='220px';this.alt='📸 Photo 1'">
+        <div class="photo-caption">🌟 Our Star Papu</div>
+      </div>
+      <div class="photo-card reveal zoom" data-tilt>
+        <img src="photo2.jpg" alt="Papu photo 2" loading="lazy" onerror="this.style.background='linear-gradient(135deg,#0d1b60,#1a0a40)';this.style.height='220px';this.alt='📸 Photo 2'">
+        <div class="photo-caption">🎈 Growing Up Beautiful</div>
+      </div>
+      <div class="photo-card reveal slideRight" data-tilt>
+        <img src="photo3.jpg" alt="Papu photo 3" loading="lazy" onerror="this.style.background='linear-gradient(135deg,#2a0a40,#0d1b60)';this.style.height='220px';this.alt='📸 Photo 3'">
+        <div class="photo-caption">💫 Always Shining</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCRATCH CARD SECTION -->
+  <section id="scratch">
+    <div class="scratch-wrapper reveal">
+      <h2 class="scratch-title">🎁 A Secret Surprise!</h2>
+      <p class="scratch-sub">Scratch the card to reveal your gift 👇</p>
+      <div class="scratch-container">
+        <div id="scratchReveal">
+          <p id="revealMsg">🎁 You Will Always Be My Favorite  ❤️</p>
+        </div>
+        <canvas id="scratchCanvas"></canvas>
+      </div>
+      <p class="scratch-hint">Scratch with finger or mouse</p>
+    </div>
+  </section>
+
+  <!-- FIREWORKS FINALE SECTION -->
+  <section id="fireworks">
+    <canvas id="fireworksCanvas"></canvas>
+    <div class="finale-text">
+      <p class="finale-big">HAPPY BIRTHDAY<br>PAPU 🎂</p>
+      <p class="finale-date">20 JUNE 🎉</p>
+      <p class="finale-love">LOVE YOU ALWAYS ❤️</p>
+      <p class="finale-from">— LINKU MAMU</p>
+    </div>
+  </section>
+
+</main>
+
+<script>
+/* ============================================
+   STAR CANVAS – background starfield
+============================================ */
+(function(){
+  const canvas = document.getElementById('starCanvas');
+  const ctx = canvas.getContext('2d');
+  let stars = [];
+
+  function resize(){
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    initStars();
+  }
+
+  function initStars(){
+    stars = [];
+    const count = Math.floor((canvas.width * canvas.height) / 3000);
+    for(let i=0;i<count;i++){
+      stars.push({
+        x: Math.random()*canvas.width,
+        y: Math.random()*canvas.height,
+        r: Math.random()*1.6+.3,
+        phase: Math.random()*Math.PI*2,
+        speed: Math.random()*.02+.005
+      });
+    }
+  }
+
+  function drawStars(t){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    stars.forEach(s=>{
+      const alpha = .3 + .7*Math.abs(Math.sin(s.phase + t*s.speed));
+      ctx.beginPath();
+      ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+      ctx.fillStyle = `rgba(255,255,255,${alpha})`;
+      ctx.fill();
+    });
+  }
+
+  let t=0;
+  function loop(){
+    t++;
+    drawStars(t);
+    requestAnimationFrame(loop);
+  }
+
+  window.addEventListener('resize',resize);
+  resize();
+  loop();
+})();
+
+/* ============================================
+   FLOATING HEARTS
+============================================ */
+(function(){
+  const layer = document.getElementById('heartsLayer');
+  const emojis = ['❤️','💛','✨','🎈','💖','⭐','🌟'];
+
+  function spawnHeart(){
+    const h = document.createElement('span');
+    h.className='fheart';
+    h.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+    const left = Math.random()*100;
+    const drift = (Math.random()-0.5)*120 + 'px';
+    const dur = Math.random()*6+7;
+    h.style.left = left+'%';
+    h.style.setProperty('--drift',drift);
+    h.style.animationDuration = dur+'s';
+    h.style.fontSize = (Math.random()*.8+.9)+'rem';
+    h.style.animationDelay = '0s';
+    h.style.opacity='0';
+    layer.appendChild(h);
+    // reuse
+    setTimeout(()=>{h.remove()}, dur*1000+500);
+  }
+
+  setInterval(spawnHeart, 600);
+})();
+
+/* ============================================
+   INTRO → MAIN TRANSITION
+============================================ */
+document.getElementById('tapBtn').addEventListener('click',function(){
+  // Start music
+  const music = document.getElementById('bgMusic');
+  music.play().catch(()=>{});
+
+  // Hide intro
+  const intro = document.getElementById('intro');
+  intro.classList.add('hide');
+  setTimeout(()=>{ intro.style.display='none'; },900);
+
+  // Show main
+  const main = document.getElementById('mainSite');
+  main.classList.add('show');
+
+  // Init scroll observer after short delay
+  setTimeout(initScrollObserver, 400);
+  setTimeout(initTypewriter, 500);
+  setTimeout(initScratch, 600);
+});
+
+/* ============================================
+   SCROLL REVEAL – Intersection Observer
+============================================ */
+function initScrollObserver(){
+  const items = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        e.target.classList.add('visible');
+        // Trigger fireworks when finale section visible
+        if(e.target.closest('#fireworks')) startFireworks();
+      }
+    });
+  },{threshold:0.15});
+  items.forEach(el=>observer.observe(el));
+
+  // Fireworks section observer
+  const fw = document.querySelector('#fireworks');
+  const fwObs = new IntersectionObserver((entries)=>{
+    if(entries[0].isIntersecting) startFireworks();
+  },{threshold:0.2});
+  fwObs.observe(fw);
+}
+
+/* ============================================
+   TYPEWRITER MESSAGE
+============================================ */
+function initTypewriter(){
+  const msg = `Dear Papu,\n\nToday is your special day.\nMay your life be filled with happiness,\nsuccess, laughter, and endless adventures.\n\nKeep smiling and keep shining.\n\nHappy Birthday Champion! 🎂✨\n\nWith Love,\nLinku Mamu ❤️`;
+  const el = document.getElementById('typewriterText');
+  let i=0;
+
+  // Observe when section is visible, then start
+  const sec = document.getElementById('message');
+  const obs = new IntersectionObserver((entries)=>{
+    if(entries[0].isIntersecting){
+      obs.disconnect();
+      type();
+    }
+  },{threshold:0.3});
+  obs.observe(sec);
+
+  function type(){
+    if(i<=msg.length){
+      el.innerHTML = msg.slice(0,i).replace(/\n/g,'<br>') + '<span class="cursor"></span>';
+      i++;
+      setTimeout(type, i===1?400:38);
+    }
+  }
+}
+
+/* ============================================
+   3D TILT PHOTO CARDS
+============================================ */
+document.querySelectorAll('[data-tilt]').forEach(card=>{
+  card.addEventListener('mousemove', tilt);
+  card.addEventListener('mouseleave', resetTilt);
+  card.addEventListener('touchmove', touchTilt, {passive:true});
+  card.addEventListener('touchend', resetTilt);
+
+  function tilt(e){
+    const r = card.getBoundingClientRect();
+    const x = e.clientX - r.left - r.width/2;
+    const y = e.clientY - r.top - r.height/2;
+    const rx = (-y/r.height)*14;
+    const ry = (x/r.width)*14;
+    card.style.transform = `perspective(800px) rotateX(${rx}deg) rotateY(${ry}deg) scale(1.03)`;
+  }
+  function touchTilt(e){
+    const touch = e.touches[0];
+    const r = card.getBoundingClientRect();
+    const x = touch.clientX - r.left - r.width/2;
+    const y = touch.clientY - r.top - r.height/2;
+    const rx = (-y/r.height)*10;
+    const ry = (x/r.width)*10;
+    card.style.transform = `perspective(800px) rotateX(${rx}deg) rotateY(${ry}deg) scale(1.03)`;
+  }
+  function resetTilt(){
+    card.style.transform = 'perspective(800px) rotateX(0) rotateY(0) scale(1)';
+  }
+});
+
+/* ============================================
+   SCRATCH CARD
+============================================ */
+function initScratch(){
+  const canvas = document.getElementById('scratchCanvas');
+  const container = document.getElementById('scratchReveal');
+  canvas.width  = container.offsetWidth  || 360;
+  canvas.height = container.offsetHeight || 160;
+  canvas.style.width  = '100%';
+  canvas.style.height = '100%';
+
+  const ctx = canvas.getContext('2d');
+
+  // Draw scratch overlay (gold foil effect)
+  const grad = ctx.createLinearGradient(0,0,canvas.width,canvas.height);
+  grad.addColorStop(0,'#c8950a');
+  grad.addColorStop(.3,'#f5c842');
+  grad.addColorStop(.6,'#e8a820');
+  grad.addColorStop(1,'#c8950a');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  // Text on cover
+  ctx.fillStyle='#0a0e2a';
+  ctx.font = `bold ${Math.min(canvas.width*.07,22)}px Georgia`;
+  ctx.textAlign='center';
+  ctx.textBaseline='middle';
+  ctx.fillText('🎁 Scratch Here!', canvas.width/2, canvas.height/2-10);
+  ctx.font=`${Math.min(canvas.width*.045,14)}px Georgia`;
+  ctx.fillText('✨ A gift awaits you ✨', canvas.width/2, canvas.height/2+18);
+
+  let scratching=false;
+  let scratchedPixels=0;
+  const totalPixels = canvas.width*canvas.height;
+  let done=false;
+
+  ctx.globalCompositeOperation='destination-out';
+
+  function scratch(x,y){
+    ctx.beginPath();
+    ctx.arc(x,y,28,0,Math.PI*2);
+    ctx.fill();
+    // Check completion
+    if(!done){
+      scratchedPixels+=Math.PI*28*28;
+      if(scratchedPixels/totalPixels > 0.45){
+        done=true;
+        setTimeout(()=>{
+          canvas.style.transition='opacity .6s';
+          canvas.style.opacity='0';
+        },300);
+      }
+    }
+  }
+
+  function getPos(e,el){
+    const r=el.getBoundingClientRect();
+    const scaleX=el.width/r.width;
+    const scaleY=el.height/r.height;
+    if(e.touches){
+      return{x:(e.touches[0].clientX-r.left)*scaleX,
+             y:(e.touches[0].clientY-r.top)*scaleY};
+    }
+    return{x:(e.clientX-r.left)*scaleX,
+           y:(e.clientY-r.top)*scaleY};
+  }
+
+  canvas.addEventListener('mousedown',  e=>{scratching=true; const p=getPos(e,canvas); scratch(p.x,p.y)});
+  canvas.addEventListener('mousemove',  e=>{if(scratching){const p=getPos(e,canvas);scratch(p.x,p.y)}});
+  canvas.addEventListener('mouseup',    ()=>{scratching=false});
+  canvas.addEventListener('touchstart', e=>{scratching=true; e.preventDefault(); const p=getPos(e,canvas); scratch(p.x,p.y)},{passive:false});
+  canvas.addEventListener('touchmove',  e=>{e.preventDefault(); const p=getPos(e,canvas); scratch(p.x,p.y)},{passive:false});
+  canvas.addEventListener('touchend',   ()=>{scratching=false});
+}
+
+/* ============================================
+   FIREWORKS
+============================================ */
+let fireworksStarted = false;
+
+function startFireworks(){
+  if(fireworksStarted) return;
+  fireworksStarted = true;
+
+  const canvas = document.getElementById('fireworksCanvas');
+  const ctx = canvas.getContext('2d');
+
+  function resize(){
+    canvas.width  = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const particles = [];
+  const colors = ['#f5c842','#ff6b9d','#ffffff','#7ec8ff','#ff9f43','#a29bfe','#fd79a8'];
+
+  function Particle(x,y,color){
+    this.x=x; this.y=y; this.color=color;
+    const angle=Math.random()*Math.PI*2;
+    const speed=Math.random()*5+2;
+    this.vx=Math.cos(angle)*speed;
+    this.vy=Math.sin(angle)*speed - Math.random()*3;
+    this.alpha=1;
+    this.size=Math.random()*3+1.5;
+    this.gravity=0.09;
+    this.decay=Math.random()*.015+.01;
+  }
+  Particle.prototype.update=function(){
+    this.vy+=this.gravity;
+    this.x+=this.vx;
+    this.y+=this.vy;
+    this.alpha-=this.decay;
+    this.vx*=0.98;
+  };
+  Particle.prototype.draw=function(){
+    ctx.save();
+    ctx.globalAlpha=Math.max(0,this.alpha);
+    ctx.beginPath();
+    ctx.arc(this.x,this.y,this.size,0,Math.PI*2);
+    ctx.fillStyle=this.color;
+    ctx.shadowColor=this.color;
+    ctx.shadowBlur=6;
+    ctx.fill();
+    ctx.restore();
+  };
+
+  function burst(){
+    const x = canvas.width*(0.15 + Math.random()*0.7);
+    const y = canvas.height*(0.1 + Math.random()*0.5);
+    const color = colors[Math.floor(Math.random()*colors.length)];
+    const n = 70 + Math.floor(Math.random()*50);
+    for(let i=0;i<n;i++) particles.push(new Particle(x,y,color));
+  }
+
+  // Launch bursts
+  burst();
+  let timer=0;
+  const intervals=[600,1300,2000,2600,3200,3700,4200,4600,5000,5400,5800];
+  intervals.forEach(t=>setTimeout(burst,t));
+
+  function loop(){
+    ctx.fillStyle='rgba(6,8,24,.22)';
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+    for(let i=particles.length-1;i>=0;i--){
+      particles[i].update();
+      particles[i].draw();
+      if(particles[i].alpha<=0) particles.splice(i,1);
+    }
+    // Keep launching sporadically
+    timer++;
+    if(timer%120===0) burst();
+    requestAnimationFrame(loop);
+  }
+  loop();
+}
+</script>
+</body>
+</html>
